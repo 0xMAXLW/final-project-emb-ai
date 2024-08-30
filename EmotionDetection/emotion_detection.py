@@ -8,18 +8,26 @@ def emotion_detector(text_to_analyse):
     response = requests.post(url, json=input_json, headers=header)
     formatted_response = json.loads(response.text)
 
-    anger_score = formatted_response["emotionPredictions"][0]["emotion"]["anger"]
-    disgust_score = formatted_response["emotionPredictions"][0]["emotion"]["disgust"]
-    fear_score = formatted_response["emotionPredictions"][0]["emotion"]["fear"]
-    joy_score = formatted_response["emotionPredictions"][0]["emotion"]["joy"]
-    sadness_score = formatted_response["emotionPredictions"][0]["emotion"]["sadness"]
-
-    dominant_emotion = None
-    largest_score = 0.0
-    for emotion, emotion_score in formatted_response["emotionPredictions"][0]["emotion"].items():
-        if emotion_score > largest_score:
-            dominant_emotion = emotion
-            largest_score = emotion_score
+    if response.status_code == 400:
+        anger_score = None
+        disgust_score = None
+        fear_score = None
+        joy_score = None
+        sadness_score = None
+        dominant_emotion = None
+    else:
+        anger_score = formatted_response["emotionPredictions"][0]["emotion"]["anger"]
+        disgust_score = formatted_response["emotionPredictions"][0]["emotion"]["disgust"]
+        fear_score = formatted_response["emotionPredictions"][0]["emotion"]["fear"]
+        joy_score = formatted_response["emotionPredictions"][0]["emotion"]["joy"]
+        sadness_score = formatted_response["emotionPredictions"][0]["emotion"]["sadness"]
+        dominant_emotion = None
+        
+        largest_score = 0.0
+        for emotion, emotion_score in formatted_response["emotionPredictions"][0]["emotion"].items():
+            if emotion_score > largest_score:
+                dominant_emotion = emotion
+                largest_score = emotion_score
 
     return {'anger': anger_score,
             'disgust': disgust_score,
